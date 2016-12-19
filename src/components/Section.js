@@ -64,8 +64,7 @@ export default class Section extends React.Component {
   }
 
   getTitleDiv(collapsed, collapsible) {
-    const {section} = this.props;
-    const {language} = this.context;
+    const {section, language} = this.props;
     if (section.type === "main") {
       return null;
     }
@@ -147,8 +146,7 @@ export default class Section extends React.Component {
   }
 
   render() {
-    const {section, user} = this.props;
-    const {language} = this.context;
+    const {section, user, language} = this.props;
     const collapsible = this.isCollapsible();
     const collapsed = collapsible && this.state.collapsed;
     const titleDiv = this.getTitleDiv(collapsed, collapsible);
@@ -208,14 +206,11 @@ Section.propTypes = {
   canComment: React.PropTypes.bool,
   canVote: React.PropTypes.bool,
   comments: React.PropTypes.object,
+  language: React.PropTypes.string,
   loadSectionComments: React.PropTypes.func,
   onPostComment: React.PropTypes.func,
   onPostVote: React.PropTypes.func,
   section: React.PropTypes.object.isRequired,
   showPlugin: React.PropTypes.bool,
   user: React.PropTypes.object,
-};
-
-Section.contextTypes = {
-  language: React.PropTypes.string.isRequired
 };

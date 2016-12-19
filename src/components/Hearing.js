@@ -76,7 +76,7 @@ export class Hearing extends React.Component {
   }
 
   getOpenGraphMetaData(data) {
-    const {language} = this.props;
+    const {hearingLanguage} = this.state;
     let hostname = "http://kerrokantasi.hel.fi";
     if (typeof HOSTNAME === 'string') {
       hostname = HOSTNAME;  // eslint-disable-line no-undef
@@ -87,7 +87,7 @@ export class Hearing extends React.Component {
     return [
       {property: "og:url", content: url},
       {property: "og:type", content: "website"},
-      {property: "og:title", content: getAttr(data.title, language)}
+      {property: "og:title", content: getAttr(data.title, hearingLanguage)}
       // TODO: Add description and image?
     ];
   }
@@ -189,7 +189,7 @@ export class Hearing extends React.Component {
     const regularSections = hearing.sections.filter((section) => !isSpecialSectionType(section.type));
     const sectionGroups = groupSections(regularSections);
     const fullscreenMapPlugin = hasFullscreenMapPlugin(hearing);
-    const {language} = this.props;
+    const {hearingLanguage, selectHearingLanguage} = this.props;
 
     return (
       <div id="hearing-wrapper">
@@ -198,19 +198,20 @@ export class Hearing extends React.Component {
         <h1 className="page-title">
           {this.getFollowButton()}
           {!hearing.published ? <Icon name="eye-slash"/> : null}
-          {getAttr(hearing.title, language)}
+          {getAttr(hearing.title, hearingLanguage)}
         </h1>
 
         <Row>
-          <Sidebar hearing={hearing} mainSection={mainSection} sectionGroups={sectionGroups}/>
+          <Sidebar hearing={hearing} hearingLanguage={hearingLanguage} selectHearingLanguage={selectHearingLanguage} mainSection={mainSection} sectionGroups={sectionGroups}/>
           <Col md={8} lg={9}>
             <div id="hearing">
               <div>
                 <HearingImageList images={mainSection.images}/>
-                <div className="hearing-abstract lead" dangerouslySetInnerHTML={{__html: hearing.abstract}}/>
+                <div className="hearing-abstract lead" dangerouslySetInnerHTML={{__html: getAttr(hearing.abstract, hearingLanguage)}}/>
               </div>
               {hearing.closed ? <Section section={closureInfoSection} canComment={false}/> : null}
               {mainSection ? <Section
+                language={hearingLanguage}
                 showPlugin={!fullscreenMapPlugin}
                 section={mainSection}
                 canComment={this.isMainSectionCommentable(hearing, user)}
@@ -228,6 +229,7 @@ export class Hearing extends React.Component {
             {sectionGroups.map((sectionGroup) => (
               <div id={"hearing-sectiongroup-" + sectionGroup.type} key={sectionGroup.type}>
                 <SectionList
+                  language={hearingLanguage}
                   sections={sectionGroup.sections}
                   nComments={sectionGroup.n_comments}
                   canComment={hearingAllowsComments}
@@ -252,15 +254,16 @@ Hearing.propTypes = {
   intl: intlShape.isRequired,
   dispatch: React.PropTypes.func,
   hearing: React.PropTypes.object,
+  hearingLanguage: React.PropTypes.string,
   hearingSlug: React.PropTypes.string,
-  language: React.PropTypes.string,
   location: React.PropTypes.object,
   user: React.PropTypes.object,
   sectionComments: React.PropTypes.object,
+  selectHearingLanguage: React.PropTypes.func
 };
 
 export function wrapHearingComponent(component, pure = true) {
-  const wrappedComponent = connect((state) => ({language: state.language}), null, null, {pure})(injectIntl(component));
+  const wrappedComponent = connect(null, null, null, {pure})(injectIntl(component));
   // We need to re-hoist the data statics to the wrapped component due to react-intl:
   wrappedComponent.canRenderFully = component.canRenderFully;
   wrappedComponent.fetchData = component.fetchData;

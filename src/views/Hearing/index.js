@@ -12,6 +12,15 @@ import getAttr from '../../utils/getAttr';
 
 
 export class HearingView extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      hearingLanguage: props.language
+    };
+
+    this.selectHearingLanguage = this.selectHearingLanguage.bind(this);
+  }
   /**
    * Return a promise that will, as it fulfills, have added requisite
    * data for the HearingView view into the dispatch's associated store.
@@ -43,6 +52,12 @@ export class HearingView extends React.Component {
   componentDidMount() {
     const {dispatch, params, location} = this.props;
     HearingView.fetchData(dispatch, null, location, params);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.language !== this.props.language) {
+      this.setState({hearingLanguage: nextProps.language});
+    }
   }
 
   getOpenGraphMetaData(data) {
@@ -81,10 +96,17 @@ export class HearingView extends React.Component {
     return fullscreenParam === "true";
   }
 
+  selectHearingLanguage(language) {
+    this.setState({
+      hearingLanguage: language
+    });
+  }
+
   render() {
     const {hearingSlug} = this.props.params;
     const {state, data: hearing} = (this.props.hearing[hearingSlug] || {state: 'initial'});
     const {user, language} = this.props;
+    const {hearingLanguage} = this.state;
 
     if (state !== 'done') {
       return this.renderSpinner();
@@ -99,6 +121,8 @@ export class HearingView extends React.Component {
         <HearingComponent
           hearingSlug={hearingSlug}
           hearing={hearing}
+          hearingLanguage={hearingLanguage}
+          selectHearingLanguage={this.selectHearingLanguage}
           user={user}
           sectionComments={this.props.sectionComments}
           location={this.props.location}
@@ -112,6 +136,7 @@ HearingView.propTypes = {
   intl: intlShape.isRequired,
   dispatch: React.PropTypes.func,
   hearing: React.PropTypes.object,
+  hearingLanguage: React.PropTypes.string,
   params: React.PropTypes.object,
   language: React.PropTypes.string,
   location: React.PropTypes.object,

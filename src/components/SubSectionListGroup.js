@@ -3,7 +3,7 @@ import {ListGroup, ListGroupItem} from 'react-bootstrap';
 import Icon from '../utils/Icon';
 import getAttr from '../utils/getAttr';
 
-const SubSectionListGroup = ({sections, language = 'fi'}) => (
+const SubSectionListGroup = ({sections, language}) => (
   <ListGroup className="subsection-list-group">
     {sections && sections.map((section) =>
       <ListGroupItem className="subsection-list-group-item" key={section.id} href={`#hearing-subsection-${section.id}`}>
@@ -19,10 +19,6 @@ const SubSectionListGroup = ({sections, language = 'fi'}) => (
 
 SubSectionListGroup.propTypes = {
   sections: PropTypes.array,
-  language: PropTypes.string
-};
-
-SubSectionListGroup.contextTypes = {
   language: PropTypes.string
 };
 

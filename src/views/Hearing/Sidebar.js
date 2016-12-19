@@ -12,6 +12,7 @@ import Icon from '../../utils/Icon';
 import {hasFullscreenMapPlugin, getHearingURL} from '../../utils/hearing';
 import AutoAffix from 'react-overlays/lib/AutoAffix';
 import Row from 'react-bootstrap/lib/Row';
+import HearingLanguageSelector from './HearingLanguageSelector';
 import getAttr from '../../utils/getAttr';
 
 
@@ -37,8 +38,7 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    const {hearing, sectionGroups} = this.props;
-    const {language} = this.context;
+    const {hearing, hearingLanguage, selectHearingLanguage, sectionGroups} = this.props;
     const TOP_OFFSET = 75;
     const BOTTOM_OFFSET = 165;
 
@@ -68,6 +68,14 @@ class Sidebar extends React.Component {
                 <Icon name="clock-o"/> {formatRelativeTime("timeOpen", hearing.open_at)}<br/>
                 <Icon name="clock-o"/> {formatRelativeTime("timeClose", hearing.close_at)}
               </div>
+              <div className="sidebar-section language">
+                <h4><FormattedMessage id="hearing-language"/></h4>
+                <HearingLanguageSelector
+                  hearing={hearing}
+                  activeLanguage={hearingLanguage}
+                  onSelect={selectHearingLanguage}
+                />
+              </div>
               <div className="sidebar-section contents">
                 <h4><FormattedMessage id="table-of-content"/></h4>
                 <ListGroup>
@@ -76,8 +84,8 @@ class Sidebar extends React.Component {
                   </ListGroupItem>
                   {sectionGroups.map((sectionGroup) => (
                     <ListGroupItem href={sectionGroup.sections ? null : "#hearing-sectiongroup-" + sectionGroup.type} key={sectionGroup.type}>
-                      {getAttr(sectionGroup.name_plural, language)}
-                      <SubSectionListGroup sections={sectionGroup.sections}/>
+                      {getAttr(sectionGroup.name_plural, hearingLanguage)}
+                      <SubSectionListGroup language={hearingLanguage} sections={sectionGroup.sections}/>
                     </ListGroupItem>
                   ))}
                   {this.getCommentsItem()}
@@ -98,8 +106,10 @@ class Sidebar extends React.Component {
 
 Sidebar.propTypes = {
   hearing: React.PropTypes.object,
+  hearingLanguage: React.PropTypes.string,
   mainSection: React.PropTypes.object,
-  sectionGroups: React.PropTypes.array
+  sectionGroups: React.PropTypes.array,
+  selectHearingLanguage: React.PropTypes.func,
 };
 
 Sidebar.contextTypes = {
