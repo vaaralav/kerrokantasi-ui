@@ -52,5 +52,7 @@
   "drafts": "Luonnokset",
   "nickname": "Nimimerkki",
   "registered": "rekisteröitynyt",
-  "openFullscreenMap": "Avaa kartalla"
+  "openFullscreenMap": "Avaa kartalla",
+  "previous": "Edellinen",
+  "next": "Seuraava"
 }
