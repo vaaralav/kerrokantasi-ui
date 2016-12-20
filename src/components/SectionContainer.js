@@ -11,10 +11,10 @@ import {
   postSectionComment, postVote
 } from '../actions';
 import CommentList from './CommentList';
-import HearingImageList from './HearingImageList';
+// import HearingImageList from './HearingImageList';
 import LabelList from './LabelList';
 import Section from './Section';
-import SectionList from './SectionList';
+// import SectionList from './SectionList';
 import Sidebar from '../views/Hearing/Sidebar';
 import _ from 'lodash';
 import Icon from '../utils/Icon';
@@ -32,9 +32,9 @@ import {
   userCanComment,
   userCanVote
 } from '../utils/section';
-import getAttr from '../utils/getAttr';
 
-export class Hearing extends React.Component {
+
+class SectionContainer extends React.Component {
 
   openFullscreen(hearing) {
     this.props.dispatch(push(getHearingURL(hearing, {fullscreen: true})));
@@ -76,7 +76,6 @@ export class Hearing extends React.Component {
   }
 
   getOpenGraphMetaData(data) {
-    const {language} = this.props;
     let hostname = "http://kerrokantasi.hel.fi";
     if (typeof HOSTNAME === 'string') {
       hostname = HOSTNAME;  // eslint-disable-line no-undef
@@ -87,7 +86,7 @@ export class Hearing extends React.Component {
     return [
       {property: "og:url", content: url},
       {property: "og:type", content: "website"},
-      {property: "og:title", content: getAttr(data.title, language)}
+      {property: "og:title", content: data.title}
       // TODO: Add description and image?
     ];
   }
@@ -181,15 +180,14 @@ export class Hearing extends React.Component {
   }
 
   render() {
-    const hearing = this.props.hearing;
-    const user = this.props.user;
-    const hearingAllowsComments = acceptsComments(hearing);
+    const {hearing, section, user, sectionComments} = this.props;
+    // const hearingAllowsComments = acceptsComments(hearing);
+    // const closureInfoSection = this.getClosureInfo(hearing);
+    // const regularSections = hearing.sections.filter((section) => !isSpecialSectionType(section.type));
     const mainSection = getMainSection(hearing);
-    const closureInfoSection = this.getClosureInfo(hearing);
-    const regularSections = hearing.sections.filter((section) => !isSpecialSectionType(section.type));
+    const regularSections = hearing.sections.filter((sect) => !isSpecialSectionType(sect.type));
     const sectionGroups = groupSections(regularSections);
-    const fullscreenMapPlugin = hasFullscreenMapPlugin(hearing);
-    const {language} = this.props;
+    // const fullscreenMapPlugin = hasFullscreenMapPlugin(hearing);
 
     return (
       <div id="hearing-wrapper">
@@ -198,49 +196,21 @@ export class Hearing extends React.Component {
         <h1 className="page-title">
           {this.getFollowButton()}
           {!hearing.published ? <Icon name="eye-slash"/> : null}
-          {getAttr(hearing.title, language)}
+          {hearing.title}
         </h1>
 
         <Row>
           <Sidebar hearing={hearing} mainSection={mainSection} sectionGroups={sectionGroups}/>
           <Col md={8} lg={9}>
-            <div id="hearing">
-              <div>
-                <HearingImageList images={mainSection.images}/>
-                <div className="hearing-abstract lead" dangerouslySetInnerHTML={{__html: hearing.abstract}}/>
-              </div>
-              {hearing.closed ? <Section section={closureInfoSection} canComment={false}/> : null}
-              {mainSection ? <Section
-                showPlugin={!fullscreenMapPlugin}
-                section={mainSection}
-                canComment={this.isMainSectionCommentable(hearing, user)}
-                onPostComment={this.onPostSectionComment.bind(this)}
-                onPostVote={this.onVoteComment.bind(this)}
-                canVote={this.isMainSectionVotable(user)}
-                loadSectionComments={this.loadSectionComments.bind(this)}
-                comments={this.props.sectionComments[mainSection.id]}
-                user={user}
-              /> : null}
-            </div>
-
-            {this.getLinkToFullscreen(hearing)}
-
-            {sectionGroups.map((sectionGroup) => (
-              <div id={"hearing-sectiongroup-" + sectionGroup.type} key={sectionGroup.type}>
-                <SectionList
-                  sections={sectionGroup.sections}
-                  nComments={sectionGroup.n_comments}
-                  canComment={hearingAllowsComments}
-                  onPostComment={this.onPostSectionComment.bind(this)}
-                  canVote={hearingAllowsComments}
-                  onPostVote={this.onVoteComment.bind(this)}
-                  loadSectionComments={this.loadSectionComments.bind(this)}
-                  sectionComments={this.props.sectionComments}
-                  user={user}
-                />
-              </div>
-            ))}
-            {this.getCommentList()}
+            <Section
+              section={section}
+              canComment={false}// this.props.canComment && userCanComment(user, section)}
+              onPostComment={false}// this.props.onPostComment}
+              canVote={false}// this.props.canVote && userCanVote(user, section)}
+              onPostVote={false}// this.props.onPostVote}
+              comments={sectionComments}// this.props.loadSectionComments}
+              user={user}
+            />
           </Col>
         </Row>
       </div>
@@ -248,23 +218,23 @@ export class Hearing extends React.Component {
   }
 }
 
-Hearing.propTypes = {
+SectionContainer.propTypes = {
   intl: intlShape.isRequired,
   dispatch: React.PropTypes.func,
   hearing: React.PropTypes.object,
   hearingSlug: React.PropTypes.string,
-  language: React.PropTypes.string,
   location: React.PropTypes.object,
   user: React.PropTypes.object,
+  section: React.PropTypes.object,
   sectionComments: React.PropTypes.object,
 };
 
-export function wrapHearingComponent(component, pure = true) {
-  const wrappedComponent = connect((state) => ({language: state.language}), null, null, {pure})(injectIntl(component));
+export function wrapSectionContainer(component, pure = true) {
+  const wrappedComponent = connect(null, null, null, {pure})(injectIntl(component));
   // We need to re-hoist the data statics to the wrapped component due to react-intl:
   wrappedComponent.canRenderFully = component.canRenderFully;
   wrappedComponent.fetchData = component.fetchData;
   return wrappedComponent;
 }
 
-export default wrapHearingComponent(Hearing);
+export default wrapSectionContainer(SectionContainer);

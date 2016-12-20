@@ -97,3 +97,19 @@ export function canEdit(user, hearing) {
   // If the user is an admin of the hearing's organization, allow editing
   return Boolean(user && _.includes(user.adminOrganizations || [], hearing.organization));
 }
+
+export function getOpenGraphMetaData(title, pathname) {
+  let hostname = "http://kerrokantasi.hel.fi";
+  if (typeof HOSTNAME === 'string') {
+    hostname = HOSTNAME;  // eslint-disable-line no-undef
+  } else if (typeof window !== 'undefined') {
+    hostname = window.location.protocol + "//" + window.location.host;
+  }
+  const url = hostname + pathname;
+  return [
+    {property: "og:url", content: url},
+    {property: "og:type", content: "website"},
+    {property: "og:title", content: title}
+    // TODO: Add description and image?
+  ];
+}
