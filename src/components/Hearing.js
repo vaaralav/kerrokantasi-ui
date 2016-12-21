@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/lib/Button';
 import Col from 'react-bootstrap/lib/Col';
 import Row from 'react-bootstrap/lib/Row';
 import {injectIntl, intlShape, FormattedMessage} from 'react-intl';
-
+import Scroll from 'react-scroll';
 import {
   fetchSectionComments, followHearing,
   postSectionComment, postVote
@@ -35,6 +35,24 @@ import {
 import getAttr from '../utils/getAttr';
 
 export class Hearing extends React.Component {
+
+  componentDidMount() {
+    const {location: {hash}} = this.props;
+    Scroll.scroller.scrollTo(hash);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {location: {hash}} = this.props;
+    const {location: {hash: nextHash}} = nextProps;
+
+    if (nextHash && nextHash !== hash) {
+      Scroll.scroller.scrollTo(nextHash);
+    }
+
+    if (hash && !nextHash) {
+      window.scrollTo(0, 0);
+    }
+  }
 
   openFullscreen(hearing) {
     this.props.dispatch(push(getHearingURL(hearing, {fullscreen: true})));
@@ -189,7 +207,7 @@ export class Hearing extends React.Component {
     const regularSections = hearing.sections.filter((section) => !isSpecialSectionType(section.type));
     const sectionGroups = groupSections(regularSections);
     const fullscreenMapPlugin = hasFullscreenMapPlugin(hearing);
-    const {language} = this.props;
+    const {language, location} = this.props;
 
     return (
       <div id="hearing-wrapper">
@@ -202,7 +220,7 @@ export class Hearing extends React.Component {
         </h1>
 
         <Row>
-          <Sidebar hearing={hearing} mainSection={mainSection} sectionGroups={sectionGroups}/>
+          <Sidebar hearing={hearing} isHearingPage mainSection={mainSection} sectionGroups={sectionGroups}/>
           <Col md={8} lg={9}>
             <div id="hearing">
               <div>
@@ -241,7 +259,9 @@ export class Hearing extends React.Component {
                 />
               </div>
             ))}
-            {this.getCommentList()}
+            <Scroll.Element name="#hearing-comments">
+              {this.getCommentList()}
+            </Scroll.Element>
           </Col>
         </Row>
       </div>

@@ -47,7 +47,7 @@ class QuestionView extends Component {
     QuestionView.fetchData(dispatch, null, location, params);
   }
 
-  componentWillMount() {
+  componentDidUpdate() {
     window.scrollTo(0, 0);
   }
 

@@ -223,7 +223,7 @@ class SectionContainer extends React.Component {
   }
 
   render() {
-    const {hearing, section, user, sectionComments, language} = this.props;
+    const {hearing, section, user, sectionComments, language, location} = this.props;
     // const hearingAllowsComments = acceptsComments(hearing);
     // const closureInfoSection = this.getClosureInfo(hearing);
     // const regularSections = hearing.sections.filter((section) => !isSpecialSectionType(section.type));
@@ -243,7 +243,7 @@ class SectionContainer extends React.Component {
         </h1>
 
         <Row>
-          <Sidebar hearing={hearing} mainSection={mainSection} sectionGroups={sectionGroups}/>
+          <Sidebar hearing={hearing} location={location} mainSection={mainSection} sectionGroups={sectionGroups}/>
           <Col md={8} lg={9}>
             <div className="section-browser">
               <Link className="to-hearing" to={getHearingURL(hearing)}>

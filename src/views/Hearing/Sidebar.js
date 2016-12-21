@@ -1,4 +1,6 @@
 import React from 'react';
+import {LinkContainer} from 'react-router-bootstrap';
+// import {Link} from 'react-router';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import Col from 'react-bootstrap/lib/Col';
@@ -18,21 +20,29 @@ import getAttr from '../../utils/getAttr';
 class Sidebar extends React.Component {
 
   getCommentsItem() {
-    const hearing = this.props.hearing;
+    const {hearing, isHearingPage} = this.props;
     const fullscreen = hasFullscreenMapPlugin(hearing);
     const commentsURL = (
-      fullscreen ? getHearingURL(hearing, {fullscreen: true}) : "#hearing-comments"
+      fullscreen ? getHearingURL(hearing, {fullscreen: true}) : `${getHearingURL(hearing)}#hearing-comments`
     );
     if (this.props.mainSection.n_comments === 0) {
       return null;
     }
-    return (
-      <ListGroupItem href={commentsURL}>
+
+    const CommentsGroupItem = ({...rest}) =>
+      <ListGroupItem {...rest}>
         <FormattedMessage id={fullscreen ? "commentsOnMap" : "comments"}/>
         <div className="comment-icon">
           <Icon name="comment-o"/>&nbsp;{this.props.mainSection.n_comments}
         </div>
-      </ListGroupItem>
+      </ListGroupItem>;
+
+    return (
+      isHearingPage ?
+        <CommentsGroupItem href={commentsURL}/> :
+        <LinkContainer to={commentsURL}>
+          <CommentsGroupItem/>
+        </LinkContainer>
     );
   }
 
@@ -71,13 +81,15 @@ class Sidebar extends React.Component {
               <div className="sidebar-section contents">
                 <h4><FormattedMessage id="table-of-content"/></h4>
                 <ListGroup>
-                  <ListGroupItem href="#hearing">
-                    <FormattedMessage id="hearing"/>
-                  </ListGroupItem>
+                  <LinkContainer to={getHearingURL(hearing)}>
+                    <ListGroupItem>
+                      <FormattedMessage id="hearing"/>
+                    </ListGroupItem>
+                  </LinkContainer>
                   {sectionGroups.map((sectionGroup) => (
                     <ListGroupItem href={sectionGroup.sections ? null : "#hearing-sectiongroup-" + sectionGroup.type} key={sectionGroup.type}>
                       {getAttr(sectionGroup.name_plural, language)}
-                      <SubSectionListGroup sections={sectionGroup.sections}/>
+                      <SubSectionListGroup hearingSlug={hearing.slug} sections={sectionGroup.sections}/>
                     </ListGroupItem>
                   ))}
                   {this.getCommentsItem()}
@@ -98,8 +110,14 @@ class Sidebar extends React.Component {
 
 Sidebar.propTypes = {
   hearing: React.PropTypes.object,
+  isHearingPage: React.PropTypes.bool,
   mainSection: React.PropTypes.object,
+  router: React.PropTypes.object,
   sectionGroups: React.PropTypes.array
+};
+
+Sidebar.defaultProps = {
+  isHearingPage: false
 };
 
 Sidebar.contextTypes = {
