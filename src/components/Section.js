@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React from 'react';
-import {Link, LocationDescriptor} from 'react-router';
+import {Link} from 'react-router';
 import CommentList from './CommentList';
 import Icon from '../utils/Icon';
 import {isSpecialSectionType, userCanComment} from '../utils/section';
@@ -228,7 +228,11 @@ Section.propTypes = {
   canVote: React.PropTypes.bool,
   comments: React.PropTypes.object,
   isCollapsible: React.PropTypes.bool,
-  linkTo: LocationDescriptor,
+  linkTo: React.PropTypes.oneOfType([
+    React.PropTypes.string,
+    React.PropTypes.object,
+    React.PropTypes.func
+  ]),
   loadSectionComments: React.PropTypes.func,
   onPostComment: React.PropTypes.func,
   onPostVote: React.PropTypes.func,
