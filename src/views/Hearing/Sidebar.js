@@ -1,6 +1,6 @@
 import React from 'react';
-import {LinkContainer} from 'react-router-bootstrap';
-// import {Link} from 'react-router';
+import Scroll from 'react-scroll';
+import {Link} from 'react-router';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import Col from 'react-bootstrap/lib/Col';
@@ -16,10 +16,21 @@ import AutoAffix from 'react-overlays/lib/AutoAffix';
 import Row from 'react-bootstrap/lib/Row';
 import getAttr from '../../utils/getAttr';
 
+const CustomGroupItem = ({Wrapper, className = '', children, ...rest}) =>
+  <Wrapper className={`list-group-item ${className}`} {...rest}>
+    {children}
+  </Wrapper>;
+
+CustomGroupItem.propTypes = {
+  className: React.PropTypes.string,
+  children: React.PropTypes.elements,
+  Wrapper: React.PropTypes.element
+};
+
 
 class Sidebar extends React.Component {
 
-  getCommentsItem() {
+  getCommentsTOCItem() {
     const {hearing, isHearingPage} = this.props;
     const fullscreen = hasFullscreenMapPlugin(hearing);
     const commentsURL = (
@@ -30,19 +41,33 @@ class Sidebar extends React.Component {
     }
 
     const CommentsGroupItem = ({...rest}) =>
-      <ListGroupItem {...rest}>
+      <CustomGroupItem {...rest}>
         <FormattedMessage id={fullscreen ? "commentsOnMap" : "comments"}/>
         <div className="comment-icon">
           <Icon name="comment-o"/>&nbsp;{this.props.mainSection.n_comments}
         </div>
-      </ListGroupItem>;
+      </CustomGroupItem>;
 
     return (
       isHearingPage ?
-        <CommentsGroupItem href={commentsURL}/> :
-        <LinkContainer to={commentsURL}>
-          <CommentsGroupItem/>
-        </LinkContainer>
+        <CommentsGroupItem Wrapper={Scroll.Link} to="#hearing-comments" spy smooth/> :
+        <CommentsGroupItem Wrapper={Link} to={commentsURL}/>
+    );
+  }
+
+  getHearingTOCItem() {
+    const {hearing, isHearingPage} = this.props;
+    const hearingURL = getHearingURL(hearing);
+
+    const HearingGroupItem = ({...rest}) =>
+      <CustomGroupItem {...rest}>
+        <FormattedMessage id="hearing"/>
+      </CustomGroupItem>;
+
+    return (
+      isHearingPage ?
+        <HearingGroupItem Wrapper={Scroll.Link} to="#hearing" spy smooth /> :
+        <HearingGroupItem Wrapper={Link} to={hearingURL}/>
     );
   }
 
@@ -81,18 +106,14 @@ class Sidebar extends React.Component {
               <div className="sidebar-section contents">
                 <h4><FormattedMessage id="table-of-content"/></h4>
                 <ListGroup>
-                  <LinkContainer to={getHearingURL(hearing)}>
-                    <ListGroupItem>
-                      <FormattedMessage id="hearing"/>
-                    </ListGroupItem>
-                  </LinkContainer>
+                  {this.getHearingTOCItem()}
                   {sectionGroups.map((sectionGroup) => (
                     <ListGroupItem href={sectionGroup.sections ? null : "#hearing-sectiongroup-" + sectionGroup.type} key={sectionGroup.type}>
                       {getAttr(sectionGroup.name_plural, language)}
                       <SubSectionListGroup hearingSlug={hearing.slug} sections={sectionGroup.sections}/>
                     </ListGroupItem>
                   ))}
-                  {this.getCommentsItem()}
+                  {this.getCommentsTOCItem()}
                 </ListGroup>
               </div>
             </Col>

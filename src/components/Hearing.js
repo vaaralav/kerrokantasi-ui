@@ -38,20 +38,8 @@ export class Hearing extends React.Component {
 
   componentDidMount() {
     const {location: {hash}} = this.props;
-    Scroll.scroller.scrollTo(hash);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const {location: {hash}} = this.props;
-    const {location: {hash: nextHash}} = nextProps;
-
-    if (nextHash && nextHash !== hash) {
-      Scroll.scroller.scrollTo(nextHash);
-    }
-
-    if (hash && !nextHash) {
-      window.scrollTo(0, 0);
-    }
+    // Without {smooth: true} link active status is not updated
+    Scroll.scroller.scrollTo(hash, {smooth: true});
   }
 
   openFullscreen(hearing) {
@@ -212,7 +200,6 @@ export class Hearing extends React.Component {
     return (
       <div id="hearing-wrapper">
         <LabelList className="main-labels" labels={hearing.labels}/>
-
         <h1 className="page-title">
           {this.getFollowButton()}
           {!hearing.published ? <Icon name="eye-slash"/> : null}
@@ -222,7 +209,7 @@ export class Hearing extends React.Component {
         <Row>
           <Sidebar hearing={hearing} isHearingPage mainSection={mainSection} sectionGroups={sectionGroups}/>
           <Col md={8} lg={9}>
-            <div id="hearing">
+            <Scroll.Element name="#hearing" id="hearing">
               <div>
                 <HearingImageList images={mainSection.images}/>
                 <div className="hearing-abstract lead" dangerouslySetInnerHTML={{__html: hearing.abstract}}/>
@@ -239,7 +226,7 @@ export class Hearing extends React.Component {
                 comments={this.props.sectionComments[mainSection.id]}
                 user={user}
               /> : null}
-            </div>
+            </Scroll.Element>
 
             {this.getLinkToFullscreen(hearing)}
 
