@@ -39,7 +39,7 @@ export class Hearing extends React.Component {
   componentDidMount() {
     const {location: {hash}} = this.props;
     // Without {smooth: true} link active status is not updated
-    Scroll.scroller.scrollTo(hash, {smooth: true});
+    Scroll.scroller.scrollTo(hash);
   }
 
   openFullscreen(hearing) {

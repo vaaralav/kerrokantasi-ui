@@ -50,7 +50,7 @@ class Sidebar extends React.Component {
 
     return (
       isHearingPage ?
-        <CommentsGroupItem Wrapper={Scroll.Link} to="#hearing-comments" spy smooth/> :
+        <CommentsGroupItem Wrapper={Scroll.Link} to="#hearing-comments" spy /> :
         <CommentsGroupItem Wrapper={Link} to={commentsURL}/>
     );
   }
@@ -66,7 +66,7 @@ class Sidebar extends React.Component {
 
     return (
       isHearingPage ?
-        <HearingGroupItem Wrapper={Scroll.Link} to="#hearing" spy smooth /> :
+        <HearingGroupItem Wrapper={Scroll.Link} to="#hearing" spy /> :
         <HearingGroupItem Wrapper={Link} to={hearingURL}/>
     );
   }
